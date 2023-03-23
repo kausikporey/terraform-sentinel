@@ -19,6 +19,6 @@ resource "aws_rds_cluster" "mycluster" {
   database_name           = "mydb"
   master_username         = "admiin"
   master_password         = "password"
-  backup_retention_period = 5
+  # backup_retention_period = 5
   preferred_backup_window = "07:00-09:00"
 }
