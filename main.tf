@@ -23,5 +23,5 @@ resource "aws_rds_cluster" "postgresql" {
   master_password         = "Intelligent1234"
   backup_retention_period = 5
   preferred_backup_window = "07:00-09:00"
-  iam_database_authentication_enabled = true
+  # iam_database_authentication_enabled = true
 }
