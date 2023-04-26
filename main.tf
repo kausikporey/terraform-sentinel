@@ -16,11 +16,11 @@ resource "aws_lb" "frontend"{}
 
 resource "aws_lb_listener" "front_end" {
   load_balancer_arn = aws_lb.frontend.arn
-  port              = "80"
+  port              = "443"
   protocol          = "HTTP"
 
   default_action {
-    type = "forward"
+    type = "redirect"
 
     # redirect {
     #   port        = "443"
