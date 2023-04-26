@@ -20,7 +20,7 @@ resource "aws_lb_listener" "front_end" {
   protocol          = "HTTP"
 
   default_action {
-    type = "redirect"
+    type = "forward"
 
     # redirect {
     #   port        = "443"
