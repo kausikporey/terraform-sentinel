@@ -12,37 +12,18 @@ provider "aws" {
   shared_credentials_files = ["/users/DT495QF/.aws/credentials"]
 }
 
-resource "aws_lb" "frontend"{}
-
-resource "aws_lb_target_group" "ip-example" {
-  name        = "tf-example-lb-tg"
-  port        = 80
-  protocol    = "HTTP"
-  target_type = "ip"
-  vpc_id      = data.aws_vpc.selected.id
+resource "aws_s3_bucket" "example" {
+  bucket = "my-tf-test-bucket"
 }
 
-data "aws_vpc" "selected" {
-    id = "vpc-084b927968551367f"
-}
 
-resource "aws_lb_listener" "front_end" {
-  load_balancer_arn = aws_lb.frontend.arn
-  port              = "80"
-  protocol          = "HTTP"
+resource "aws_lb" "lb_logs" {
+  name               = "test-lb-tf"
+  internal           = false
+  load_balancer_type = "application"
 
-  default_action {
-   type = "redirect"
-
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
-    }
-  }
-  
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.ip_example.arn
+  access_logs {
+    bucket  = aws_s3_bucket.lb_logs.id
+    enabled = true
   }
 }
