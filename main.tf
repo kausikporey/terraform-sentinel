@@ -1,48 +1,54 @@
-terraform {
-  required_providers {
-    aws = {
-      source = "hashicorp/aws"
-      version = "4.63.0"
+data "aws_iam_policy_document" "assume_role" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
     }
+
+    actions = ["sts:AssumeRole"]
   }
 }
 
-provider "aws" {
-  region = "us-west-2"
-  shared_credentials_files = ["/users/DT495QF/.aws/credentials"]
+resource "aws_iam_role" "iam_for_lambda" {
+  name               = "iam_for_lambda"
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
 }
 
-resource "aws_lb" "frontend"{}
-
-resource "aws_lb_target_group" "ip-example" {
-  name        = "tf-example-lb-tg"
-  port        = 80
-  protocol    = "HTTP"
-  target_type = "ip"
-  vpc_id      = data.aws_vpc.selected.id
+resource "aws_lambda_function" "test_lambda" {
+  filename      = "lambda_function_payload.zip"
+  function_name = "lambda_function_name"
+  role          = aws_iam_role.iam_for_lambda.arn
+  handler       = "index.test"
+  runtime = "nodejs14.x"
 }
 
-data "aws_vpc" "selected" {
-    id = "vpc-084b927968551367f"
-}
-
-resource "aws_lb_listener" "front_end" {
-  load_balancer_arn = aws_lb.frontend.arn
-  port              = "80"
-  protocol          = "HTTP"
-
-  default_action {
-   type = "redirect"
-
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
-    }
-  }
-  
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.ip_example.arn
+resource "aws_secretsmanager_secret" "example" {
+  name = "example"
+  rotation_lambda_arn = aws_lambda_function.test_lambda.arn
+  rotation_rules {
+    automatically_after_days = 7
   }
 }
+
+
+resource "aws_secretsmanager_secret_rotation" "example" {
+  secret_id           = aws_secretsmanager_secret.example.id
+  rotation_lambda_arn = aws_lambda_function.test_lambda.arn
+
+  rotation_rules {
+    automatically_after_days = 30
+    schedule_expression = "rate(3 days)"
+  }
+}
+
+# resource "aws_secretsmanager_secret_rotation" "example2" {
+#   secret_id           = aws_secretsmanager_secret.example.id
+#   rotation_lambda_arn = aws_lambda_function.test_lambda.arn
+
+#   rotation_rules {
+#     automatically_after_days = 60
+#     # schedule_expression = "rate(3 months)"
+#   }
+# }
