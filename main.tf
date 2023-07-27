@@ -1,23 +1,5 @@
-resource "aws_kms_key" "example" {
-  description = "example"
-}
-
-resource "aws_kms_key_policy" "example" {
-  key_id = aws_kms_key.example.id
-  policy = jsonencode({
-    Id = "example"
-    Statement = [
-      {
-        Action = "kms:*"
-        Effect = "Allow"
-        Principal = {
-          AWS = "*"
-        }
-
-        Resource = "*"
-        Sid      = "Enable IAM User Permissions"
-      },
-    ]
-    Version = "2012-10-17"
-  })
+resource "aws_lb" "test" {
+  name               = "test-lb-tf"
+  internal           = false
+  load_balancer_type = "application"
 }
