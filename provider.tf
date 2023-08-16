@@ -7,7 +7,4 @@ terraform {
   }
 }
 
-provider "aws" {
-  shared_credentials_files = ["/Users/DT495QF/.aws/credentials"]
-  region                   = "us-east-1"
-}
+provider "aws" {}

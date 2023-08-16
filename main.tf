@@ -1,23 +1,6 @@
-resource "aws_kms_key" "example" {
-  description = "example"
-}
-
-resource "aws_kms_key_policy" "example" {
-  key_id = aws_kms_key.example.id
-  policy = jsonencode({
-    Id = "example"
-    Statement = [
-      {
-        Action = "kms:*"
-        Effect = "Allow"
-        Principal = {
-          AWS = "*"
-        }
-
-        Resource = "*"
-        Sid      = "Enable IAM User Permissions"
-      },
-    ]
-    Version = "2012-10-17"
-  })
+resource "aws_neptune_cluster" "neptune-cluster" {
+  cluster_identifier                  = "neptune-cluster-demo"
+  engine                              = "neptune"
+  backup_retention_period             = 5
+  enable_cloudwatch_logs_exports      = "audit"
 }
